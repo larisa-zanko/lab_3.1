@@ -3,53 +3,55 @@ import java.util.Scanner;
 import java.util.StringTokenizer;// класс для разделения строк на слова
 
 
-
 //3.Строка состоит из слов. За один просмотр символов строки найти все слова, начинающиеся с гласных букв,
 // и занести их в новую строку, заменяя первую букву каждого слова на прописную. Слова в исходной строке разделяются
 // некоторым множеством разделителей. Слова в новой строке должны разделяться ровно одним пробелом.
 
+// Задание переделанное. Будем искать слова, которые начинаются с СОГЛАСНЫХ букв и заносить их в новую строку, заменяя первую букву каждого слова на прописную. 
+
 public class lab_3_1_zanko {
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Введите строку: ");
-        String input = scanner.nextLine();
-        // вызываем метод для поиска слов, начинающихся на гласную
-        String result = find_Words(input);
-        System.out.println("Результат: " + result);
+        String input = "привет, как дела? у меня всё хорошо. это пример строки!";
+        String result = findAndCapitalizeConsonantWords(input);
+        System.out.println(result);
     }
 
-    public static String find_Words(String input) {
-        StringBuilder resultBuilder = new StringBuilder();
-        // Используем StringTokenizer для разделения входной строки на слова по заданным разделителям
-        StringTokenizer tokenizer = new StringTokenizer(input, " ,.;:!?-");
+    public static String findAndCapitalizeConsonantWords(String input) {
+        // Определяем согласные буквы
+        String consonants = "бвгджзйклмнпрстфхцчшщБВГДЖЗЙКЛМНПРСТФХЦЧШЩ";
+        StringBuilder result = new StringBuilder();
+        boolean isWord = false; // Флаг для отслеживания слова
+        StringBuilder currentWord = new StringBuilder(); // Для хранения текущего слова
 
-        // проходим по всем словам
-        while (tokenizer.hasMoreTokens()) {
-            String word = tokenizer.nextToken();
-
-            // проверяем начинается ли слово с гласной буквы
-            if (startsWithVowel(word)) {
-                //если да, то заменяем первую букву на прописную
-                String capitalizedWord = capitalizeFirstLetter(word);
-                //добавляем слово в созданую ранее результитующую строк, слова разделяем одним пробелом
-                resultBuilder.append(capitalizedWord).append(" ");
+        for (char ch : input.toCharArray()) {
+            if (Character.isLetter(ch)) { // Проверяем, является ли символ буквой
+                currentWord.append(ch); // Добавляем букву к текущему слову
+                isWord = true; // Устанавливаем флаг, что мы внутри слова
+            } else {
+                // Если символ не буква и мы находимся внутри слова
+                if (isWord) {
+                    if (currentWord.length() > 0 && consonants.indexOf(currentWord.charAt(0)) != -1) {
+                        // Если слово начинается с согласной, добавляем его в результат
+                        String capitalizedWord = Character.toUpperCase(currentWord.charAt(0)) + currentWord.substring(1);
+                        if (result.length() > 0) {
+                            result.append(" "); // Добавляем пробел перед следующим словом
+                        }
+                        result.append(capitalizedWord);
+                    }
+                    currentWord.setLength(0); // Очищаем текущее слово
+                }
+                isWord = false; // Сбрасываем флаг, так как мы вышли из слова
             }
         }
 
-        // Преобразуем StringBuilder в строку и удаляем лишний пробел в конце
-        return resultBuilder.length() > 0 ? resultBuilder.toString().trim() : "";
-    }
-
-    // метод проверки, начинается ли слово на гласную
-    private static boolean startsWithVowel(String word) {
-        char firstChar = Character.toLowerCase(word.charAt(0));
-        // проверяем, является ли первый символ гласной буквой (два варианта либо русский язык, либо английский)
-        return "aeiouаеёиоуыэюя".indexOf(firstChar) != -1; // Гласные буквы
-    }
-
-    private static String capitalizeFirstLetter(String word) {
-        if (word.length() == 0) return word;
-        //заменяем первую буку на прописную и добавляем остальную чвасть слова
-        return Character.toUpperCase(word.charAt(0)) + word.substring(1);
+        // Обработка последнего слова, если оно есть
+        if (isWord && currentWord.length() > 0 && consonants.indexOf(currentWord.charAt(0)) != -1) {
+            String capitalizedWord = Character.toUpperCase(currentWord.charAt(0)) + currentWord.substring(1);
+            if (result.length() > 0) {
+                result.append(" "); // Добавляем пробел перед следующим словом
+            }
+            result.append(capitalizedWord);
+        }
+        return result.toString();
     }
 }
